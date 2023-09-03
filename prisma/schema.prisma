@@ -12,8 +12,20 @@ datasource db {
   relationMode = "prisma"
 }
 
+// message model
 model Message {
   id        Int      @id @default(autoincrement())
   content  String
   createdAt DateTime @default(now())
+  userId Int
+  user    User   @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+// user model
+model User {
+  id       Int       @id @default(autoincrement())
+  username String    @unique
+  messages Message[]
 }

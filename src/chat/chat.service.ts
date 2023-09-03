@@ -4,23 +4,38 @@ import { PrismaService } from 'src/prisma.service';
 export type MessageType = {
   id: number;
   content: string;
+  userId: number;
   createdAt: Date;
 };
 
 @Injectable()
 export class ChatService {
   constructor(private prisma: PrismaService) {}
+  async saveMessage(username: string, message: string) {
+    // Upsert user
+    const user = await this.prisma.user.upsert({
+      where: { username },
+      update: {},
+      create: { username },
+    });
 
-  async saveMessage(content: string): Promise<MessageType> {
+    // Create message
     return await this.prisma.message.create({
       data: {
-        content: content,
+        content: message,
+        userId: user.id,
+      },
+      include: {
+        user: true,
       },
     });
   }
 
-  async getMessages(): Promise<string[]> {
-    const messages = await this.prisma.message.findMany();
-    return messages.map((message) => message.content);
+  async getMessages() {
+    return await this.prisma.message.findMany({
+      include: {
+        user: true,
+      },
+    });
   }
 }

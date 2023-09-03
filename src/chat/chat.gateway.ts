@@ -34,9 +34,15 @@ export class ChatGateway
   }
 
   @SubscribeMessage('message')
-  async handleMessage(client: Socket, content: string): Promise<void> {
-    await this.chatService.saveMessage(content);
-    this.server.emit('message', content);
+  async handleChatEvent(
+    client: any,
+    payload: { content: string; username: string },
+  ) {
+    const message = await this.chatService.saveMessage(
+      payload.username,
+      payload.content,
+    );
+    this.server.emit('message', message);
   }
 
   @SubscribeMessage('loadMessages')
