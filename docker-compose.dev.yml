@@ -1,13 +1,13 @@
 version: '3.2'
 
 services:
-  eventapi:
+  chatapi:
     # build: .  # Path to the directory containing the Dockerfile
     image: "startup2023/chatapi:dev-latest"
     ports:
       - "${NESTJS_PORT}:${NESTJS_PORT}"
-    # depends_on:
-    #   - database
+    depends_on:
+      - chat_database
     volumes:
       - ./:/usr/src/app  # Replace with the path where your NestJS app should store persistent data
     environment:
@@ -15,10 +15,10 @@ services:
     env_file:
       - .env
     networks:
-      - myoeapi_network 
+      - myoeapi_chat_network 
     restart: always
   
-  database:
+  chat_database:
     image: "postgres:13"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
